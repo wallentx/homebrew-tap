@@ -13,7 +13,7 @@ class Panoptes < Formula
   def install
     ENV["PANOPTES_GIT_SHA"] = build.head? ? Utils.git_head : "1c0052b5d12a624a53c6d756cff021166bb7833d"
     system "cargo", "install", *std_cargo_args
-    generate_completions_from_executable(bin/"panoptes", "completions", shells: [:bash, :zsh, :fish])
+    generate_completions_from_executable(bin/"panoptes", "completions")
   end
 
   def caveats
