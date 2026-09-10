@@ -1,0 +1,53 @@
+name: Homebrew install and test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: homebrew-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Install and test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    env:
+      HOMEBREW_NO_ANALYTICS: "1"
+      HOMEBREW_NO_ENV_HINTS: "1"
+    steps:
+      - name: Check out the tap
+        uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
+        with:
+          persist-credentials: false
+
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@3b81d438eda92ee13b5849940d993be027717ecf
+        with:
+          stable: true
+
+      - name: Check formula style
+        run: brew style wallentx/tap/panoptes
+
+      - name: Install from source
+        run: brew install --build-from-source wallentx/tap/panoptes
+
+      - name: Audit the formula
+        run: brew audit --strict wallentx/tap/panoptes
+
+      - name: Test indexing and retrieval
+        run: brew test wallentx/tap/panoptes
+
+      - name: Verify executable and agent integrations
+        run: |
+          panoptes version
+          panoptes init --provider cursor --provider opencode --dry-run
