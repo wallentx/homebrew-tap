@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-15-intel]
     env:
       HOMEBREW_NO_ANALYTICS: "1"
       HOMEBREW_NO_ENV_HINTS: "1"
@@ -38,8 +38,16 @@ jobs:
       - name: Check formula style
         run: brew style wallentx/tap/panoptes
 
-      - name: Install from source
-        run: brew install --build-from-source wallentx/tap/panoptes
+      - name: Verify stable install does not require Rust
+        run: |
+          dependencies=$(brew deps --include-build wallentx/tap/panoptes)
+          if grep -Fxq rust <<< "$dependencies"; then
+            echo "Stable binary installation must not depend on Rust" >&2
+            exit 1
+          fi
+
+      - name: Install release binary
+        run: brew install wallentx/tap/panoptes
 
       - name: Audit the formula
         run: brew audit --strict wallentx/tap/panoptes

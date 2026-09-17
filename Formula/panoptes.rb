@@ -1,19 +1,50 @@
 class Panoptes < Formula
   desc "Local repository structure and retrieval CLI for coding agents"
   homepage "https://github.com/wallentx/panoptes"
-  url "https://github.com/wallentx/panoptes/archive/1c0052b5d12a624a53c6d756cff021166bb7833d.tar.gz"
-  version "0.1.0"
-  sha256 "a112171d4c16c66e229e068ccd024eaf21204656158c07800024dbfd50f2b762"
   license "MIT"
-  head "https://github.com/wallentx/panoptes.git", branch: "main"
 
-  depends_on "rust" => :build
+  head do
+    url "https://github.com/wallentx/panoptes.git", branch: "main"
+    depends_on "rust" => :build
+  end
+
   depends_on "git"
 
+  on_macos do
+    on_arm do
+      url "https://github.com/wallentx/panoptes/releases/download/v1.0.0/panoptes-1.0.0-aarch64-apple-darwin.tar.gz"
+      sha256 "35237546139211480bb0a5e641c03b04d92501029d967bcc89e55f2514f7bc8d"
+    end
+
+    on_intel do
+      url "https://github.com/wallentx/panoptes/releases/download/v1.0.0/panoptes-1.0.0-x86_64-apple-darwin.tar.gz"
+      sha256 "fe3b8f3db1559d9ceca21f6db92d5d55a9a62ad52a72aeb4a88bfa961294c114"
+    end
+  end
+
+  on_linux do
+    on_arm do
+      url "https://github.com/wallentx/panoptes/releases/download/v1.0.0/panoptes-1.0.0-aarch64-unknown-linux-gnu.tar.gz"
+      sha256 "51fafd96e6df1b7b2565e37984162533247ad81eb53509617a839f2cb577faf4"
+    end
+
+    on_intel do
+      url "https://github.com/wallentx/panoptes/releases/download/v1.0.0/panoptes-1.0.0-x86_64-unknown-linux-gnu.tar.gz"
+      sha256 "5f7de858a690279dbb0d960d32ee7326afe3ad0a23d1bd3173b999ca4233429a"
+    end
+  end
+
   def install
-    ENV["PANOPTES_GIT_SHA"] = build.head? ? Utils.git_head : "1c0052b5d12a624a53c6d756cff021166bb7833d"
-    system "cargo", "install", *std_cargo_args
-    generate_completions_from_executable(bin/"panoptes", "completions")
+    if build.head?
+      ENV["PANOPTES_GIT_SHA"] = Utils.git_head
+      system "cargo", "install", *std_cargo_args
+      generate_completions_from_executable(bin/"panoptes", "completions")
+    else
+      bin.install "panoptes"
+      bash_completion.install "completions/panoptes.bash" => "panoptes"
+      zsh_completion.install "completions/_panoptes"
+      fish_completion.install "completions/panoptes.fish"
+    end
   end
 
   def caveats
@@ -27,6 +58,11 @@ class Panoptes < Formula
   end
 
   test do
+    unless build.head?
+      metadata = JSON.parse(shell_output("#{bin}/panoptes version --json"))
+      assert_equal version.to_s, metadata.fetch("version")
+    end
+
     (testpath/"src/example.ts").write <<~TYPESCRIPT
       export function greet(name: string) { return "hello " + name; }
       export function main() { return greet("world"); }
