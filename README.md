@@ -45,8 +45,8 @@ Each supported OS/architecture has a versioned archive URL and verified checksum
 ## Maintain the formula
 
 After a new stable release has uploaded all four archives and `SHA256SUMS`, update
-`Formula/panoptes.rb` with the release version, four asset URLs, and their SHA-256
-checksums. Download the archives and verify them against `SHA256SUMS` before
+`Formula/panoptes.rb` with the four asset URLs and their SHA-256 checksums.
+Homebrew infers the release version from these URLs. Download the archives and verify them against `SHA256SUMS` before
 updating the formula. Keep versioned URLs so installs remain reproducible.
 `brew update` picks up formula updates; `brew upgrade` installs the newer release.
 Use `revision` for packaging changes that need an upgrade without changing the

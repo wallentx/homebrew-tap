@@ -1,7 +1,6 @@
 class Panoptes < Formula
   desc "Local repository structure and retrieval CLI for coding agents"
   homepage "https://github.com/wallentx/panoptes"
-  version "1.0.0"
   license "MIT"
 
   head do
