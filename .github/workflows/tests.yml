@@ -13,6 +13,18 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  updater:
+    name: Test release updater
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out the tap
+        uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
+        with:
+          persist-credentials: false
+      - name: Run updater regression tests
+        run: python3 -B -m unittest discover -s tests -v
+
   test:
     name: Install and test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}

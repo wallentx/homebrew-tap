@@ -1,0 +1,59 @@
+name: Update Panoptes formula
+
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Stable tag, such as v1.0.2; blank selects the latest release.
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: update-panoptes-formula
+  cancel-in-progress: false
+
+jobs:
+  update:
+    if: github.ref == 'refs/heads/wallentx/tap'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Check out the tap branch
+        uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
+        with:
+          ref: wallentx/tap
+
+      - name: Test the updater
+        run: python3 -B -m unittest discover -s tests -v
+
+      - name: Verify release assets and update formula
+        id: formula
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: python3 scripts/update-panoptes.py --version "$RELEASE_VERSION"
+
+      - name: Validate and publish formula
+        if: steps.formula.outputs.changed == 'true'
+        env:
+          RELEASE_VERSION: ${{ steps.formula.outputs.version }}
+        run: |
+          set -euo pipefail
+          ruby -c Formula/panoptes.rb
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git status --short --branch
+          git var GIT_AUTHOR_IDENT
+          git add Formula/panoptes.rb
+          git commit -m "chore: bump panoptes to $RELEASE_VERSION"
+          git push origin HEAD:refs/heads/wallentx/tap
+          # GITHUB_TOKEN pushes do not trigger push workflows; dispatch tests explicitly.
+          gh workflow run tests.yml --repo "$GITHUB_REPOSITORY" --ref wallentx/tap

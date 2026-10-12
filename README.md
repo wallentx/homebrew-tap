@@ -38,19 +38,44 @@ clients. Existing clients may still be running the previous executable.
 
 ## Packaged release
 
-The formula installs Panoptes `v1.0.0` from its
-[release assets](https://github.com/wallentx/panoptes/releases/tag/v1.0.0).
+The [formula](Formula/panoptes.rb) tracks stable Panoptes releases with complete
+[release assets](https://github.com/wallentx/panoptes/releases).
 Each supported OS/architecture has a versioned archive URL and verified checksum.
 
 ## Maintain the formula
 
-After a new stable release has uploaded all four archives and `SHA256SUMS`, update
-`Formula/panoptes.rb` with the four asset URLs and their SHA-256 checksums.
-Homebrew infers the release version from these URLs. Download the archives and verify them against `SHA256SUMS` before
-updating the formula. Keep versioned URLs so installs remain reproducible.
-`brew update` picks up formula updates; `brew upgrade` installs the newer release.
-Use `revision` for packaging changes that need an upgrade without changing the
-upstream version.
+The `Update Panoptes formula` workflow checks the latest stable release every
+15 minutes on the default `wallentx/tap` branch. GitHub can delay scheduled runs.
+It uses this repository's `GITHUB_TOKEN`; no personal or cross-repository token
+is needed for scheduled updates. Partial uploads are retried on a later run.
+
+Before changing the formula, the updater downloads all four archives, verifies
+`SHA256SUMS`, and checks each embedded `release.json` against the release tag,
+version, platform, and tag commit. It refuses downgrades and leaves the formula
+unchanged if verification fails. After pushing a formula update it explicitly
+dispatches the install/test workflow, because pushes made with `GITHUB_TOKEN`
+do not trigger ordinary push workflows.
+
+To request an update immediately:
+
+```sh
+gh workflow run update-panoptes.yml --repo wallentx/homebrew-tap --ref wallentx/tap -f version=v1.0.2
+```
+
+The Panoptes release workflow can also dispatch this updater immediately after
+publishing assets when its optional `HOMEBREW_TAP_TOKEN` secret is configured.
+That token only needs Actions write access to this tap; without it, scheduled
+updates remain automatic. Pre-releases are not promoted into the stable formula.
+
+For a local, verified manual edit (requires Python 3.11+ and authenticated `gh`):
+
+```sh
+python3 scripts/update-panoptes.py --version v1.0.2
+```
+
+Review and commit the resulting formula diff. `brew update` picks up formula
+updates; `brew upgrade` installs the newer release. Use `revision` for packaging
+changes that need an upgrade without changing the upstream version.
 
 On a machine with Homebrew:
 
