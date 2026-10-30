@@ -12,25 +12,25 @@ class Panoptes < Formula
 
   on_macos do
     on_arm do
-      url "https://github.com/wallentx/panoptes/releases/download/v1.0.2/panoptes-1.0.2-aarch64-apple-darwin.tar.gz"
-      sha256 "5613a0c5aed738b976a0e058f54293bd85448162f14f77337b9c9e7956010fc9"
+      url "https://github.com/wallentx/panoptes/releases/download/v1.0.3/panoptes-1.0.3-aarch64-apple-darwin.tar.gz"
+      sha256 "28f650ec56d3a5d58f65717205011059835656effa42381d580e2dad2bb0d48d"
     end
 
     on_intel do
-      url "https://github.com/wallentx/panoptes/releases/download/v1.0.2/panoptes-1.0.2-x86_64-apple-darwin.tar.gz"
-      sha256 "d740383102cceb59eb4bdd7e0207e61c58e645c72637814a8a4126862d4e729e"
+      url "https://github.com/wallentx/panoptes/releases/download/v1.0.3/panoptes-1.0.3-x86_64-apple-darwin.tar.gz"
+      sha256 "33fe3b8488787c66ffbbd6b734766ed1d93225e4739f5da4990fdac433bdbeb5"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/wallentx/panoptes/releases/download/v1.0.2/panoptes-1.0.2-aarch64-unknown-linux-gnu.tar.gz"
-      sha256 "36fdd1b24f7302d14d5173f627604c4a70411beec6905a596732ef585714c051"
+      url "https://github.com/wallentx/panoptes/releases/download/v1.0.3/panoptes-1.0.3-aarch64-unknown-linux-gnu.tar.gz"
+      sha256 "01d413b0a5f9ce5977df03677a8ced619c49107729a6d1f310e859b6331cd29a"
     end
 
     on_intel do
-      url "https://github.com/wallentx/panoptes/releases/download/v1.0.2/panoptes-1.0.2-x86_64-unknown-linux-gnu.tar.gz"
-      sha256 "f36361593ca8ad2e318b7b6cbed07a18edc6bbc62c61b4551d7297398bc273f8"
+      url "https://github.com/wallentx/panoptes/releases/download/v1.0.3/panoptes-1.0.3-x86_64-unknown-linux-gnu.tar.gz"
+      sha256 "20e37bf9868867f40ba5a51de140f70eee962098612172fc763c017b8110b710"
     end
   end
 
